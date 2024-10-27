@@ -1,3 +1,5 @@
+package register_code;
+
 public class RegisterCode {
   private int code;
 
