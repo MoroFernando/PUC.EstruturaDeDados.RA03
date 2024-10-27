@@ -1,10 +1,12 @@
 import hash_functions.HashFunction;
+import linked_list.LinkedList;
+import linked_list.Node;
 import register_code.RegisterCode;
 import register_code.RegisterCodesArray;
 import utils.TimeCalculator;
 
 public class HashTable {
-  private int[] table;
+  private LinkedList[] table;
   private int length;
   private HashFunction hashFunction;
   private TimeCalculator timeCalculator;
@@ -12,7 +14,10 @@ public class HashTable {
 
   public HashTable(int length, HashFunction hashFunction){
     this.length = length;
-    this.table = new int[length];
+    this.table = new LinkedList[length];
+    for (int i = 0; i < length; i++) {
+      table[i] = new LinkedList(); // Inicializa cada posicao como uma LinkedList vazia
+    }
     this.hashFunction = hashFunction;
     this.timeCalculator = new TimeCalculator();
   }
@@ -25,11 +30,11 @@ public class HashTable {
     int value = registerCode.getCode();
     int key = hashFunction.hash(value, this.length);
 
-    if (this.table[key] != 0) {
+    if (!this.table[key].isEmpty()) {
       this.colisionCounter++;
     }
 
-    this.table[key] = value;
+    this.table[key].insert(registerCode);
   }
 
   public void insertEach(RegisterCodesArray registerCodesArray){
@@ -50,12 +55,32 @@ public class HashTable {
     int value = registerCode.getCode();
     int key = hashFunction.hash(value, this.length);
 
-    return this.table[key];
+    RegisterCode result = this.table[key].search(registerCode);
+
+    return result.getCode();
   }
 
-  public void print(){
+  public void resetTable(){
     for (int i = 0; i < this.length; i++) {
-      System.out.println("{ Key: " + i + " }: { Value: " + this.table[i] + " }");
+      this.table[i] = new LinkedList();
+    }
+  }
+
+  public void print() {
+    for (int i = 0; i < this.length; i++) {
+      System.out.print("Key: " + i + " => ");
+      Node current = this.table[i].getHead();
+
+      if (current == null) {
+        System.out.println("Empty");
+        continue;
+      }
+
+      while (current != null) {
+        System.out.print(current.getRegisterCode().getCode() + " -> ");
+        current = current.getNext();
+      }
+      System.out.println("null");
     }
   }
 }
